@@ -14,7 +14,7 @@ enum ClientIds {
 }
 
 enum Scope {
-    IS = 'openid profile email api',
+    IS = 'openid profile email',
     MS = 'User.Read'
 }
 

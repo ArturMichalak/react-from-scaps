@@ -10,7 +10,7 @@ class AuthService {
         const {clientRoot} = ClientConstants;
         const authority = Authorities[provider];
         const client_id = ClientIds[provider];
-        const scope = Scope[provider];
+        const scope = Scope[provider] !== '' ? Scope[provider] : undefined;
         const callback = Callbacks[provider];
         const settings: UserManagerSettings = {
             authority,

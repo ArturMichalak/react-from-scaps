@@ -3,38 +3,45 @@ import AuthService, { Providers } from "@services/auth-service";
 import { User } from "oidc-client-ts";
 
 export default () => {
-  const msAuthService = new AuthService("MS");
-  const isAuthService = new AuthService("IS");
   const [user, setUser] = useState<User>();
+
+  const providers = Object.keys(Providers) as (keyof typeof Providers)[];
+  const authServices = providers.map((key) => new AuthService(key));
+  const loginActions = authServices.map((service) => () => service.login());
+  const logoutActions = authServices.map((service) => () => service.logout());
 
   useEffect(() => {
     if (!user || user.expired) {
-      isAuthService.user.then((u) => {
-        u && setUser(u);
-      });
-      msAuthService.user.then((u) => {
-        u && setUser(u);
-      });
+      authServices.forEach((service) =>
+        service.user.then((u) => u && setUser(u))
+      );
     }
   }, [user]);
 
-  const msLogin = () => msAuthService.login();
-  const msLogout = () => msAuthService.logout();
-  const isLogin = () => isAuthService.login();
-  const isLogout = () => isAuthService.logout();
+  const authProvider = localStorage.getItem("authProvider");
 
   return (
     <main>
       {user ? (
         <>
-          <button onClick={msLogout}>MS Logout</button>
-          <button onClick={isLogout}>IS Logout</button>
+          {providers.map(
+            (key, i) =>
+              authProvider === key && (
+                <button key={i} onClick={logoutActions[i]}>
+                  logout
+                </button>
+              )
+          )}
+
           <p children={JSON.stringify(user)} />
         </>
       ) : (
         <>
-          <button onClick={msLogin}>MS Login</button>
-          <button onClick={isLogin}>IS Login</button>
+          {providers.map((key, i) => (
+            <button key={i} onClick={loginActions[i]}>
+              login {key}
+            </button>
+          ))}
         </>
       )}
     </main>

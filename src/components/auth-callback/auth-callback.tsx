@@ -9,7 +9,10 @@ const Callback: FC<{
   const navigate = useNavigate();
 
   useEffect(() => {
-    authService.loginCallback.then(() => navigate("/"));
+    authService.loginCallback.then(() => {
+      localStorage.setItem("authProvider", provider);
+      navigate("/");
+    });
   }, []);
   return <h2>Redirect...</h2>;
 };
